@@ -1,0 +1,75 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Keep this at the Xcode the app is built with: swift-format and SourceKit come from it, not from
+  # the runner image's default Xcode.
+  DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+
+jobs:
+  swiftlint:
+    name: SwiftLint
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The plugin runs SwiftLint in BuildTools: without the path it lints only that folder, and
+      # without --config it lints hidden folders too. The github-actions-logging reporter would drop
+      # the leading slash from paths outside BuildTools, so GitHub could not place its annotations.
+      - run: >-
+          swift package --package-path BuildTools --force-resolved-versions
+          plugin --allow-writing-to-package-directory
+          swiftlint lint --strict --config "$PWD/.swiftlint.yml" "$PWD"
+
+  swift-format:
+    name: swift-format
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: swift format lint --strict --recursive --parallel .
+
+  interface-builder:
+    name: No storyboards or XIBs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # SwiftLint's prohibited_interface_builder flags @IBOutlet and @IBAction, not the files.
+      - run: |
+          files=$(git ls-files -- '*.storyboard' '*.xib')
+          if [ -n "$files" ]; then
+            echo "::error::Build views in code: the project has no storyboards or XIBs."
+            echo "$files"
+            exit 1
+          fi
+
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Dependabot does not update docker:// references: bump the tag and the digest by hand.
+      - uses: docker://rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        with:
+          args: -color

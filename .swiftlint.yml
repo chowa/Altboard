@@ -1,0 +1,177 @@
+disabled_rules:
+  - trailing_comma
+  - opening_brace
+  - closure_parameter_position
+  - statement_position
+  - line_length
+  - redundant_string_enum_value
+  - todo
+  - trailing_whitespace
+  - vertical_parameter_alignment
+  - vertical_whitespace
+
+opt_in_rules:
+  - accessibility_trait_for_button
+  - array_init
+  - async_without_await
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
+  - convenience_type
+  - discarded_notification_center_observer
+  - discouraged_assert
+  - discouraged_none_name
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - file_header
+  - file_name_no_space
+  - first_where
+  - flatmap_over_map_reduce
+  - force_unwrapping
+  - identical_operands
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - last_where
+  - legacy_multiple
+  - local_doc_comment
+  - lower_acl_than_parent
+  - modifier_order
+  - overridden_super_call
+  - prefer_asset_symbols
+  - prefer_condition_list
+  - prefer_key_path
+  - prefer_self_type_over_type_of_self
+  - prefer_zero_over_explicit_init
+  - private_swiftui_state
+  - prohibited_interface_builder
+  - prohibited_super_call
+  # Explicit raw values keep stored data decodable after a case is renamed.
+  - raw_value_for_camel_cased_codable_enum
+  - reduce_into
+  - redundant_nil_coalescing
+  - redundant_self
+  - redundant_type_annotation
+  - return_value_from_void_function
+  - self_binding
+  - shorthand_optional_binding
+  - sorted_first_last
+  - superfluous_else
+  - toggle_bool
+  - unavailable_function
+  - unhandled_throwing_task
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - untyped_error_in_catch
+  - yoda_condition
+
+excluded:
+  - "**/.*"
+
+cyclomatic_complexity:
+  warning: 15
+  ignores_case_statements: true
+file_length: 800
+function_body_length: 100
+function_parameter_count: 6
+large_tuple: 3
+nesting:
+  type_level: 2
+type_body_length: 300
+
+empty_count:
+  only_after_dot: true
+
+file_header:
+  forbidden_string: "Created by"
+  required_pattern: |
+    \A(?:// swift-tools-version:[^\n]*\n\n?)?//
+    //  SWIFTLINT_CURRENT_FILENAME
+    //
+    //  Copyright \(c\) \d{4} Altboard
+    //
+    //  This file is part of Altboard and is licensed under the Altboard License
+    //  \(the "License"\); you may not use this file except in compliance with the
+    //  License\. The full text of the License is in the LICENSE file at the root of
+    //  the Altboard repository, https://github\.com/Altboard/Altboard\.
+    //
+    //  As far as the law allows, Altboard comes as is, without any warranty or
+    //  condition, and the licensor will not be liable to you for any damages
+    //  arising out of the License or the use or nature of Altboard, under any kind
+    //  of legal claim\.
+    //
+    //  In short, the License lets you change and build Altboard, and make new works
+    //  based on it, only for your own personal purposes, without any anticipated
+    //  commercial application\. It also lets you propose changes for inclusion in
+    //  Altboard, in a fork of the Altboard repository or by sending them to the
+    //  licensor\. Apart from those proposals, you may not distribute Altboard's
+    //  code, and you may not distribute any build of Altboard, changed or not\. The
+    //  License does not limit any fair use rights you have under the law\.
+    //
+    //  YOU MAY NOT USE ALTBOARD'S CODE, IN WHOLE OR IN PART, TO CREATE ANY APP OR
+    //  OTHER PRODUCT THAT YOU PUBLISH, DISTRIBUTE, OR SELL, INCLUDING THROUGH ANY
+    //  APP STORE, OR THAT YOU USE, OR PLAN TO USE, FOR ANY COMMERCIAL PURPOSE\.
+    //
+
+identifier_name:
+  excluded:
+    - id
+    - x
+    - y
+
+overridden_super_call:
+  # The "*" entry keeps the default list, which lacks these UIKit methods whose overrides must call super.
+  included:
+    - "*"
+    - adjustedContentInsetDidChange()
+    - updateProperties()
+    - updateViewConstraints()
+    - viewIsAppearing(_:)
+    - viewLayoutMarginsDidChange()
+    - viewSafeAreaInsetsDidChange()
+    - viewWillTransition(to:with:)
+    - willTransition(to:with:)
+
+redundant_discardable_let:
+  ignore_swiftui_view_bodies: true
+
+type_name:
+  excluded:
+    - ID
+
+custom_rules:
+  no_print:
+    name: "No print or NSLog"
+    regex: "\\b(print|debugPrint|dump|NSLogv?|_printChanges)\\s*\\("
+    match_kinds:
+      - identifier
+    message: "Use Logger from the os module instead of print, debugPrint, dump or NSLog; remove _printChanges before committing."
+  no_unchecked_sendable:
+    name: "No @unchecked Sendable"
+    regex: "@unchecked"
+    match_kinds:
+      - attribute.builtin
+    message: "Make the type Sendable; if that is impossible, suppress this rule with the reason why the type is thread-safe, as .agents/rules/comments.md describes."
+  no_nonisolated_unsafe:
+    name: "No nonisolated(unsafe)"
+    regex: "nonisolated\\(unsafe\\)"
+    match_kinds:
+      - attribute.builtin
+    message: "Isolate the state instead; if that is impossible, suppress this rule with the reason why access is safe, as .agents/rules/comments.md describes."
+  todo_without_gate:
+    name: "TODO or FIXME without a gate"
+    regex: "\\b(?:TODO|FIXME)\\b(?!: [^\\s-][^\\n]*? - \\S)"
+    match_kinds:
+      - comment
+      - doccomment
+      - doccomment.field
+    message: "Write TODO: <gate> - <action> or FIXME: <gate> - <action>, where the gate is a release, dependency version, issue or event."
+  disable_without_reason:
+    name: "Disable command without a reason"
+    regex: "swiftlint:disable(?::(?:next|this|previous))?(?: \\w+)+[ \\t]*$"
+    match_kinds:
+      - comment
+    message: "Write the reason after the rule names: // swiftlint:disable:next <rule> - <reason>."

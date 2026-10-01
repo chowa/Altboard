@@ -1,0 +1,33 @@
+name: CLA tests
+
+# pull_request, not pull_request_target: this runs the pull request's own files, so it must get
+# only the read-only token GitHub gives pull requests from forks.
+on:
+  pull_request:
+    paths:
+      - .github/workflows/cla-tests.yml
+      - CLA.md
+      - Scripts/check-cla.sh
+      - Scripts/check-cla-test.sh
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cla-tests.yml
+      - CLA.md
+      - Scripts/check-cla.sh
+      - Scripts/check-cla-test.sh
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: CLA tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run the CLA check tests
+        run: Scripts/check-cla-test.sh
