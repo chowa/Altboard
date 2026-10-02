@@ -1,3 +1,10 @@
 {
-  "signatures": []
+  "signatures": [
+    {
+      "login": "chowa",
+      "id": 336865186,
+      "cla_version": 1,
+      "date": "2026-10-02"
+    }
+  ]
 }
